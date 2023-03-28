@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
-import { Post, Header, Avatar, Name, PostImage, Description, Loading } from "./styles";
+import { Post, Header, Avatar, Name, Description, Loading } from "./styles";
+import LazyImage from "../../components/LazyImage";
 
 const Feed = () => {
   const [feed, setFeed] = useState([]);
@@ -10,9 +11,8 @@ const Feed = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-
   const loadPage = async (pageNumber = page, shouldRefresh = false) => {
-    if(total && pageNumber > total) return;
+    if (total && pageNumber > total) return;
 
     setLoading(true);
 
@@ -21,7 +21,7 @@ const Feed = () => {
     );
 
     const data = await response.json();
-    const totalItems = response.headers.get('X-Total-Count');
+    const totalItems = response.headers.get("X-Total-Count");
 
     setTotal(Math.floor(totalItems / 5));
     setFeed(shouldRefresh ? data : [...feed, ...data]);
@@ -37,7 +37,7 @@ const Feed = () => {
     setRefreshing(true);
     await loadPage(1, true);
     setRefreshing(false);
-  }
+  };
 
   return (
     <View>
@@ -56,7 +56,11 @@ const Feed = () => {
               <Name>{item.author.name}</Name>
             </Header>
 
-            <PostImage ratio={item.aspectRatio} source={{ uri: item.image }} />
+            <LazyImage
+              aspectRatio={item.aspectRatio}
+              source={{ uri: item.image }}
+              smallSource={{ uri: item.small }}
+            />
 
             <Description>
               <Name>{item.author.name}</Name> {item.description}
